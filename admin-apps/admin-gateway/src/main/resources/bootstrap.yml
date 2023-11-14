@@ -1,0 +1,35 @@
+admin:
+  # docker部署时，需要指定， 表示运行该服务的宿主机IP
+  local-ip: ${LOCAL_IP:${spring.cloud.client.ip-address}}
+  nacos:
+    ip: ${NACOS_IP:@pom.nacos.ip@}
+    port: ${NACOS_PORT:@pom.nacos.port@}
+    namespace: ${NACOS_ID:@pom.nacos.namespace@}
+    username: ${NACOS_USERNAME:@pom.nacos.username@}
+    password: ${NACOS_PASSWORD:@pom.nacos.password@}
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: @project.artifactId@ #admin-gateway
+  profiles:
+    active: @pom.profile.name@ #dev
+  cloud:
+    nacos:
+      config:
+        server-addr: ${admin.nacos.ip}:${admin.nacos.port}
+        file-extension: yml
+        namespace: ${admin.nacos.namespace}
+        username: ${admin.nacos.username}
+        password: ${admin.nacos.password}
+        shared-dataids: common.yml,redis.yml,mysql.yml
+        refreshable-dataids: common.yml
+        enabled: true
+      discovery:
+        server-addr: ${admin.nacos.ip}:${admin.nacos.port}
+        namespace: ${admin.nacos.namespace}
+        username: ${admin.nacos.username}
+        password: ${admin.nacos.password}
+        metadata:
+          management.context-path: ${server.servlet.context-path:}${spring.mvc.servlet.path:}${management.endpoints.web.base-path:}
+          #http://localhost:8760/api/gate/actuator

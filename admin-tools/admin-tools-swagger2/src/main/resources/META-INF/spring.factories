@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.sunjl.admin.swagger2.SwaggerAutoConfiguration

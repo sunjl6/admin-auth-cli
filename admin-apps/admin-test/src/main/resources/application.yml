@@ -1,0 +1,10 @@
+server:
+  port: 9002
+admin:
+  swagger:
+    enabled: true
+    title: 在线文档测试
+    base-package: cn.sunjl.swagger2
+dozer:
+  mappingFiles:
+    - classpath:dozer/user.xml

@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    cn.sunjl.admin.log.LogAutoConfiguration
+org.springframework.context.ApplicationContextInitializer=\
+    cn.sunjl.admin.log.init.ApplicationLoggerInitializer

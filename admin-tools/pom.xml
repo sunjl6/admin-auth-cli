@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>admin-parent</artifactId>
+        <groupId>cn.sunjl</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../admin-parent</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>admin-tools</artifactId>
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <description>公共模块</description>
+    <modules>
+        <module>admin-tools-common</module>
+        <module>admin-tools-core</module>
+        <module>admin-tools-databases</module>
+        <module>admin-tools-dozer</module>
+        <module>admin-tools-j2cache</module>
+        <module>admin-tools-jwt</module>
+        <module>admin-tools-log</module>
+        <module>admin-tools-swagger2</module>
+        <module>admin-tools-user</module>
+        <module>admin-tools-validator</module>
+        <module>admin-tools-xss</module>
+    </modules>
+</project>

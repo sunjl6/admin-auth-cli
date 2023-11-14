@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth-entity/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth-entity/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth/admin-auth-entity/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth/admin-auth-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth/admin-auth-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-auth/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/admin-test/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-apps/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-parent/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-parent/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools-log/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools-log/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-databases/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-dozer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-j2cache/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-jwt/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-jwt/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-log/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-swagger2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-validator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/admin-tools-xss/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/admin-tools/tools-j2cache/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
