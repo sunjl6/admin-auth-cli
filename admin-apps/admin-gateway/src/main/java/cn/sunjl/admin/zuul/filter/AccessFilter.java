@@ -37,10 +37,15 @@ public class AccessFilter extends BaseFilter{
     @Override
     public int filterOrder() {
         return FilterConstants.PRE_DECORATION_FILTER_ORDER+10;
+
     }
 
     @Override
     public boolean shouldFilter() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        if(!ctx.sendZuulResponse()){
+            return false;
+        }
         return true;
     }
     /**
@@ -57,14 +62,9 @@ public class AccessFilter extends BaseFilter{
         HttpServletRequest request = currentContext.getRequest();
         String method = request.getMethod();
         String requestURI = request.getRequestURI();
-//        System.out.println("requestUrl++++"+requestURI);
         String url =StrUtil.subSuf(requestURI,zuulPrefix.length());
-//        System.out.println("切割后的Url++++"+url);
         url = StrUtil.subSuf(url,url.indexOf("/",1));
-//        System.out.println("再次切割后的Url++++"+url);
         String permission = method+url;
-
-
 //        requestUrl++++/api/authority/user/profile
 //        切割后的Url++++/authority/user/profile
 //        再次切割后的Url++++/user/profile
@@ -74,14 +74,16 @@ public class AccessFilter extends BaseFilter{
         List<String> list = (List<String>) cacheObject.getValue();
         if (list == null){
             list = resourceApi.list().getData();
-//            if (list != null && list.size()>0){
-//                cacheChannel.set(CacheKey.RESOURCE,CacheKey.RESOURCE_NEED_TO_CHECK,list);
-//            }
+            if (list != null && list.size()>0){
+                cacheChannel.set(CacheKey.RESOURCE,CacheKey.RESOURCE_NEED_TO_CHECK,list);
+            }
+
         }
+
         //  第4步：判断这些资源是否包含当前请求的权限标识符，如果不包含当前请求的权限标识符，则返回未经授权错误提示
         if(list != null){
+
             long count = list.stream().filter((r) -> {
-//                System.out.println("权限列表："+r);
                 return permission.startsWith(r);
             }).count();
             if (count == 0){
@@ -89,7 +91,6 @@ public class AccessFilter extends BaseFilter{
                 return null;
             }
         }
-
 
         //  第5步：如果包含当前的权限标识符，则从zuul header中取出用户id，根据用户id取出缓存中的用户拥有的权限，如果没有取到则通过Feign调用权限服务获取并放入缓存，判断用户拥有的权限是否包含当前请求的权限标识符
         String userId = RequestContext.getCurrentContext().getZuulRequestHeaders().get(BaseContextConstants.JWT_KEY_USER_ID);
@@ -109,7 +110,7 @@ public class AccessFilter extends BaseFilter{
             //            List<String> resourceList = list.stream().map((Resource r) -> {
 //                return r.getMethod() + r.getUrl();
 //            }).collect(Collectors.toList());
-//            System.out.println("data========"+data);
+
 //            if (data !=null && data.size()>0){
 //                List<String> resourceList = data.stream().map((Resource r)->{
 //                    return r.getName()+r.getUrl();

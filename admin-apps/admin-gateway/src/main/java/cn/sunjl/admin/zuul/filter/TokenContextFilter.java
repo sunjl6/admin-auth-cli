@@ -49,6 +49,10 @@ public class TokenContextFilter extends BaseFilter{
      */
     @Override
     public boolean shouldFilter() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        if(!ctx.sendZuulResponse()){
+            return false;
+        }
         return true;
     }
 
@@ -67,15 +71,26 @@ public class TokenContextFilter extends BaseFilter{
         String userToken =
                 request.getHeader(authClientProperties.getUser().getHeaderName());
         //2, 解析token
-        JwtUserInfo userInfo = null;
+//        JwtUserInfo userInfo = new JwtUserInfo();
 
+//        try {
+//            userInfo = jwtTokenClientUtils.getUserInfo(userToken);
+
+//        } catch (BizException e) {
+//            errorResponse(e.getMessage(), e.getCode(), 200);
+//            return null;
+//        } catch (Exception e) {
+//            errorResponse("解析token出错", R.FAIL_CODE, 200);
+//            return null;
+//        }
+        JwtUserInfo userInfo = null;
         try {
             userInfo = jwtTokenClientUtils.getUserInfo(userToken);
         } catch (BizException e) {
-            errorResponse(e.getMessage(), e.getCode(), 200);
+            errorResponse(e.getMessage(),e.getCode(),200);
             return null;
         } catch (Exception e) {
-            errorResponse("解析token出错", R.FAIL_CODE, 200);
+            errorResponse("解析令牌错误",R.FAIL_CODE,200);
             return null;
         }
 
