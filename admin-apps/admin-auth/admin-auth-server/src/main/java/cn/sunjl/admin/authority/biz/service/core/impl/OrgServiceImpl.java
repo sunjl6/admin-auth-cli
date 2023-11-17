@@ -5,6 +5,7 @@ import cn.sunjl.admin.authority.biz.dao.core.OrgMapper;
 import cn.sunjl.admin.authority.biz.service.core.OrgService;
 import cn.sunjl.admin.authority.entity.core.Org;
 import cn.sunjl.admin.database.mybatis.conditions.Wraps;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,22 @@ public class OrgServiceImpl extends ServiceImpl<OrgMapper, Org> implements OrgSe
         // MySQL 全文索引
         String applySql = String.format(" MATCH(tree_path) AGAINST('%s' IN BOOLEAN MODE) ", StringUtils.join(ids, " "));
         return super.list(Wraps.<Org>lbQ().in(Org::getId, ids).or(query -> query.apply(applySql)));
+    }
+
+    @Override
+    public List<Org> getOrgsByPid(Long pid) {
+        QueryWrapper<Org> wrapper = new QueryWrapper<>();
+        wrapper.eq("parent_id", pid);
+        List<Org> orgList = baseMapper.selectList(wrapper);
+        return orgList;
+    }
+
+    @Override
+    public List<Org> getAbbreviation(String code) {
+        QueryWrapper<Org> wrapper = new QueryWrapper<>();
+        wrapper.eq("abbreviation",code);
+        List<Org> orgs = baseMapper.selectList(wrapper);
+        return orgs;
     }
 
     @Override

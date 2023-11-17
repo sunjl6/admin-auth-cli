@@ -124,6 +124,9 @@ public class AccessFilter extends BaseFilter{
         count2 =  userPermmsionsList.stream().filter((resource)->{
             return permission.contains(resource);
         }).count();
+//        System.out.println("拥有的权限列表"+userPermissionObject);
+//        System.out.println("访问的权限"+permission);
+//        System.out.println("拥有权限的数量"+count2);
       //  第7步：如果用户拥有的权限不包含当前请求的权限标识符则说明当前用户没有权限，返回未经授权错误提示
         if (count2>0){
             return null;

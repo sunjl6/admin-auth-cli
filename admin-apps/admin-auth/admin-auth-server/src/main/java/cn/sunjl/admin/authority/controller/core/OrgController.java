@@ -74,6 +74,20 @@ public class OrgController extends BaseController {
         return this.success(this.orgService.getById(id));
     }
 
+    @ApiOperation(value = "PID查询所有子部门", notes = "PID查询组织")
+    @GetMapping("/getOrgsByPid/{pid}")
+    @SysLog("查询组织")
+    public R<List<Org>> getOrgsByPid(@PathVariable Long pid) {
+        return this.success(orgService.getOrgsByPid(pid));
+    }
+    @ApiOperation(value = "查询所有部门编码", notes = "查询部门编码")
+    @GetMapping("/getAbbreviation/{code}")
+    @SysLog("查询组织")
+    public R<List<Org>> getAbbreviation(@PathVariable String code) {
+        return this.success(orgService.getAbbreviation(code));
+    }
+
+
     /**
      * 新增组织
      */
