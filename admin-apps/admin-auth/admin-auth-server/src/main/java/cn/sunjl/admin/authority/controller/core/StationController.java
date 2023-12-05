@@ -14,6 +14,7 @@ import cn.sunjl.admin.database.mybatis.conditions.Wraps;
 import cn.sunjl.admin.database.mybatis.conditions.query.LbqWrapper;
 import cn.sunjl.admin.dozer.DozerUtils;
 import cn.sunjl.admin.log.annotation.SysLog;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
@@ -62,6 +63,13 @@ public class StationController extends BaseController {
         stationService.page(page,query);
         return success(page);
     }
+    //    查询所有岗位不分页
+    @ApiOperation(value = "查询所有岗位不分页", notes = "查询所有岗位不分页")
+    @GetMapping("/getAllStations")
+    @SysLog("查询所有岗位不分页")
+    public R<List<Station>> getAllStations() {
+        return success(stationService.list());
+    }
 
     /**
      * 根据id查询岗位
@@ -84,7 +92,15 @@ public class StationController extends BaseController {
         stationService.save(station);
         return success(station);
     }
-
+//    更具部门id 查询下面所有岗位
+    @ApiOperation(value = "根据部门ID查询所有岗位", notes = "根据部门ID查询所有岗位")
+    @GetMapping("/getStationsByOrgId/{orgId}")
+    @SysLog("根据部门ID查询所有岗位")
+    public R<List<Station>> getStationsByOrgId(@PathVariable Long orgId) {
+        QueryWrapper<Station> wrapper = new QueryWrapper<>();
+        wrapper.eq("org_id",orgId);
+        return success(stationService.list(wrapper));
+    }
     /**
      * 修改岗位
      */

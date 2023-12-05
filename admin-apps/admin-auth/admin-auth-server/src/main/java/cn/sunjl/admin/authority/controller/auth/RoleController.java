@@ -1,4 +1,6 @@
 package cn.sunjl.admin.authority.controller.auth;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,7 @@ import cn.sunjl.admin.database.mybatis.conditions.Wraps;
 import cn.sunjl.admin.database.mybatis.conditions.query.LbqWrapper;
 import cn.sunjl.admin.dozer.DozerUtils;
 import cn.sunjl.admin.log.annotation.SysLog;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -159,7 +162,7 @@ public class RoleController extends BaseController {
      */
     @ApiOperation(value = "查询角色拥有的资源id集合", notes = "查询角色拥有的资源id集合")
     @GetMapping("/authority/{roleId}")
-    @SysLog("查询角色拥有的资源")
+    @SysLog("查询角色拥有的资源id集合")
     public R<RoleAuthoritySaveDTO> findAuthorityIdByRoleId(@PathVariable Long roleId) {
         List<RoleAuthority> list = roleAuthorityService.list(Wraps.<RoleAuthority>lbQ().eq(RoleAuthority::getRoleId, roleId));
         List<Long> menuIdList = list.stream().filter(item -> AuthorizeType.MENU.eq(item.getAuthorityType())).mapToLong(RoleAuthority::getAuthorityId).boxed().collect(Collectors.toList());
@@ -190,5 +193,70 @@ public class RoleController extends BaseController {
     @SysLog("根据角色编码查询用户ID")
     public R<List<Long>> findUserIdByCode(@RequestParam(value = "codes") String[] codes) {
         return success(roleService.findUserIdByCode(codes));
+    }
+
+    // 获取所有角色 不分页
+    @ApiOperation(value = "获取所有角色", notes = "获取所有角色")
+    @GetMapping("/list")
+    @SysLog("获取所有角色")
+    public R<List<Role>> list() {
+        return success(roleService.list());
+    }
+
+    // 给用户分配多个角色 使用 @RequestBody UserRoleSaveDTO userRole
+    @ApiOperation(value = "更新用户角色", notes = "更新用户角色")
+    @PutMapping("/assignRoles/{userId}")
+    @SysLog("更新用户角色")
+    public R assignRoles(@PathVariable Long userId,@RequestParam("roleIds[]") List<Long> ids) {
+        QueryWrapper<UserRole> wrapper = new QueryWrapper();
+        wrapper.eq("user_id",userId);
+        List<UserRole> listRole = userRoleService.list(wrapper);
+        Long[] rolesIdsInSql = listRole.stream().map(UserRole::getRoleId).toArray(Long[]::new);
+
+
+        List<Long> a = ids;
+        System.out.println(a);
+        List<Long> b = Arrays.asList(rolesIdsInSql);
+        System.out.println(b);
+
+        // 这个循环是 比较数据库拿出来的爵角色是否包含我这个 如果没用 那么就插入数据
+        for (int i = 0; i < a.size(); i++) {
+            Boolean isExist = isExist(a.get(i), b);
+            if (isExist==false){
+                UserRole userRole = new UserRole();
+                userRole.setUserId(userId);
+                userRole.setRoleId(a.get(i));
+                userRole.setCreateUser(this.getUserId());
+                userRoleService.save(userRole);
+            }
+        }
+
+
+        // 这个循环是反过来 把b'里的元素和a比较 如果没用就删除 ，有说明一样的 不做变动
+        for (int i = 0; i < b.size(); i++) {
+            Boolean isExist = isExist(b.get(i), a);
+//            System.out.println("当前角色id"+b.get(i)+"和传递过来的id比较存在的值是"+isExist);
+            if (isExist==false){
+                // 这里判断没用了 那么就删除这条记录
+                QueryWrapper<UserRole> wrapper1 = new QueryWrapper();
+                wrapper1.eq("user_id",userId).eq("role_id",b.get(i));
+                userRoleService.remove(wrapper1);
+            }
+        }
+
+        return success("修改角色成功");
+    }
+
+    // 数组判断是否有一样的，元素
+    private Boolean isExist (Long id,List<Long> list){
+        boolean b = false;
+        for (int i = 0; i < list.size(); i++) {
+            Long sqlId = list.get(i);
+            if (id.equals(sqlId)){
+                b = true;
+                break;
+            }
+        }
+        return b;
     }
 }

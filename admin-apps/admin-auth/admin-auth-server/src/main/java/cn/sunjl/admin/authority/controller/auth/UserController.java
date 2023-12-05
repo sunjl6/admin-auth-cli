@@ -3,10 +3,13 @@ import cn.sunjl.admin.authority.biz.service.auth.RoleService;
 import cn.sunjl.admin.authority.biz.service.auth.UserService;
 import cn.sunjl.admin.authority.biz.service.core.OrgService;
 import cn.sunjl.admin.authority.biz.service.core.StationService;
+import cn.sunjl.admin.authority.config.MinioConfig;
 import cn.sunjl.admin.authority.dto.auth.*;
 import cn.sunjl.admin.authority.entity.auth.Role;
 import cn.sunjl.admin.authority.entity.auth.User;
+import cn.sunjl.admin.authority.entity.auth.UserExt;
 import cn.sunjl.admin.authority.entity.core.Org;
+import cn.sunjl.admin.authority.utils.MinioUtil;
 import cn.sunjl.admin.base.BaseController;
 import cn.sunjl.admin.base.R;
 import cn.sunjl.admin.base.entity.SuperEntity;
@@ -14,12 +17,14 @@ import cn.sunjl.admin.context.BaseContextConstants;
 import cn.sunjl.admin.database.mybatis.conditions.Wraps;
 import cn.sunjl.admin.database.mybatis.conditions.query.LbqWrapper;
 import cn.sunjl.admin.dozer.DozerUtils;
+import cn.sunjl.admin.exception.BizException;
 import cn.sunjl.admin.log.annotation.SysLog;
 import cn.sunjl.admin.user.feign.UserQuery;
 import cn.sunjl.admin.user.model.SysOrg;
 import cn.sunjl.admin.user.model.SysRole;
 import cn.sunjl.admin.user.model.SysStation;
 import cn.sunjl.admin.user.model.SysUser;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
@@ -29,11 +34,17 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,6 +72,28 @@ public class UserController extends BaseController {
     private StationService stationService;
     @Autowired
     private DozerUtils dozer;
+    @Autowired
+    private MinioUtil minioUtil;
+    @Autowired
+    private MinioConfig minioConfig;
+
+    // 用户修改头像
+    @ApiOperation(value = "用户上传头像")
+    @PostMapping("/uploadAvatar/{id}")
+    public R upload(@RequestParam("file") MultipartFile file,@PathVariable Long id) {
+        String url = "";
+        User user = new User();
+        String objectName = minioUtil.upload(file);
+        if (null != objectName) {
+            url = minioConfig.getEndpoint() + "/" + minioConfig.getBucketName() + "/" + objectName;
+            user.setId(id);
+            user.setAvatar(url);
+            userService.updateUser(user);
+            return R.success(url);
+        }
+        return R.fail("上传失败");
+    }
+
 
     /**
      * 分页查询用户
@@ -91,10 +124,11 @@ public class UserController extends BaseController {
                 .like(User::getEmail, userPage.getEmail())
                 .like(User::getMobile, userPage.getMobile())
                 .eq(User::getSex, userPage.getSex())
+                .eq(User::getEmployeeId,userPage.getEmployeeId())
                 .eq(User::getStatus, userPage.getStatus())
+                .eq(User::getDeleted, 0)
                 .orderByDesc(User::getId);
 //        userService.page(page, wrapper);
-
         userService.findPage(page, wrapper);
         return success(page);
     }
@@ -105,9 +139,21 @@ public class UserController extends BaseController {
     @ApiOperation(value = "查询用户", notes = "查询用户")
     @GetMapping("/{id}")
     @SysLog("查询用户")
-    public R<User> get(@PathVariable Long id) {
+    public R<UserExt> get(@PathVariable Long id) {
         String token = request.getHeader(JWT_KEY_USER_ID);
-        return success(userService.getById(id));
+        User user = userService.getById(id);
+        if (user.getOrgId() == null){
+            return R.fail("获取不到部门信息，请先添加");
+        }
+        if (user.getStationId() == null) {
+            return R.fail("无法获取岗位信息，请先添加");
+        }
+        String orgName = orgService.getById(user.getOrgId()).getName();
+        String stationName = stationService.getById(user.getStationId()).getName();
+        UserExt userExt = dozer.map(user, UserExt.class);
+        userExt.setOrgName(orgName);
+        userExt.setStationName(stationName);
+        return success(userExt);
     }
 
 // 查询所以用户
@@ -129,7 +175,20 @@ public class UserController extends BaseController {
         userService.saveUser(user);
         return success(user);
     }
-
+    // 批量新增用户
+    @ApiOperation(value = "批量新增用户", notes = "批量新增用户用于excel导入")
+    @PostMapping ("/saveUserBatch")
+    @SysLog("新增用户")
+    public R saveBatch(@RequestBody @Valid List<UserSaveDTO> dataList) {
+        List<User> userList = new ArrayList<>();
+        for (int i = 0; i < dataList.size(); i++) {
+            System.out.println(dataList.get(i).getPassword());
+            User user = dozer.map(dataList.get(i), User.class);
+            user.setPassword(DigestUtils.md5Hex(dataList.get(i).getPassword()));
+            userList.add(user);
+        }
+        return success(userService.saveBatch(userList));
+    }
     /**
      * 修改用户
      */

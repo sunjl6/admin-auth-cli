@@ -203,6 +203,9 @@ public abstract class DefaultGlobalExceptionHandler {
     @ExceptionHandler(PersistenceException.class)
     public R<String> persistenceException(PersistenceException ex, HttpServletRequest request) {
         log.warn("PersistenceException:", ex);
+        if (ex.getMessage().contains("Duplicate entry")){
+            return R.result(ExceptionCode.SQL_EX.getCode(),StrPool.EMPTY, "重复添加");
+        }
         if (ex.getCause() instanceof BizException) {
             BizException cause = (BizException) ex.getCause();
             return R.result(cause.getCode(), StrPool.EMPTY, cause.getMessage());

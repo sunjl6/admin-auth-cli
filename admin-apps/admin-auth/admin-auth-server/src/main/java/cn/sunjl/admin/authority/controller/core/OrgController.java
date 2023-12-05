@@ -63,6 +63,13 @@ public class OrgController extends BaseController {
         this.orgService.page(page, query);
         return this.success(page);
     }
+    // 查询所有组织 的 名称 id 和 编码
+    @ApiOperation(value = "查询所有组织不分页", notes = "查询所有组织不分页")
+    @GetMapping("/getAllOrgs")
+    @SysLog("查询所有组织不分页")
+    public R<List<Org>> getAllOrgs() {
+      return this.success(orgService.list());
+    }
 
     /**
      * 查询组织

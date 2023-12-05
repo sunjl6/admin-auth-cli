@@ -14,6 +14,7 @@ import cn.sunjl.admin.exception.code.ExceptionCode;
 import cn.sunjl.admin.jwt.server.utils.JwtTokenServerUtils;
 import cn.sunjl.admin.jwt.utils.JwtUserInfo;
 import cn.sunjl.admin.jwt.utils.Token;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -42,8 +43,13 @@ public class AuthManager {
     public R<LoginDTO> login(String account, String password) {
         // 登录验证
         R<User> result = checkUser(account, password);
+        Boolean accountStatus = checkStatus(account);
         if (result.getIsError()) {
             return R.fail(result.getCode(), result.getMsg());
+        }
+        // 判断账号是否停用
+        if (accountStatus == false){
+            return R.fail("账号已停用,请联系领导");
         }
         User user = result.getData();
 
@@ -54,6 +60,7 @@ public class AuthManager {
                 findVisibleResource(ResourceQueryDTO.builder().
                         userId(user.getId()).build());
         List<String> permissionsList = null;
+        System.out.println(resourceList);
         if(resourceList != null && resourceList.size() > 0){
             permissionsList = resourceList.stream().
                     map(Resource::getCode).
@@ -80,6 +87,13 @@ public class AuthManager {
         return token;
     }
 
+    // 验证账号是否停用
+    private Boolean checkStatus(String account){
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("account",account);
+        User user = this.userService.getOne(wrapper);
+        return user.getStatus();
+    }
     // 登录验证
     private R<User> checkUser(String account, String password) {
         User user = this.userService.getOne(Wrappers.<User>lambdaQuery()
@@ -87,7 +101,9 @@ public class AuthManager {
 
         // 密码加密
         String passwordMd5 = DigestUtils.md5Hex(password);
-
+//        System.out.println("md5加密后的密码"+passwordMd5);
+//        System.out.println("数据库获取的密码" + user.getPassword());
+//        System.out.println("用户是"+user.getAccount());
         if (user == null || !user.getPassword().equals(passwordMd5)) {
             return R.fail(ExceptionCode.JWT_USER_INVALID);
         }

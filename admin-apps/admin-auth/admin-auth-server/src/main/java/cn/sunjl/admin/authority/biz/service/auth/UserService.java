@@ -2,6 +2,7 @@ package cn.sunjl.admin.authority.biz.service.auth;
 
 import cn.sunjl.admin.authority.dto.auth.RoleSaveDTO;
 import cn.sunjl.admin.authority.dto.auth.RoleUpdateDTO;
+import cn.sunjl.admin.authority.dto.auth.UserSaveDTO;
 import cn.sunjl.admin.authority.dto.auth.UserUpdatePasswordDTO;
 import cn.sunjl.admin.authority.entity.auth.Role;
 import cn.sunjl.admin.authority.entity.auth.User;
@@ -19,6 +20,8 @@ public interface UserService extends IService<User> {
      * @param keyword 账号或名称
      */
     List<User> findUserByRoleId(Long roleId, String keyword);
+
+
 
     /**
      * 修改输错密码的次数

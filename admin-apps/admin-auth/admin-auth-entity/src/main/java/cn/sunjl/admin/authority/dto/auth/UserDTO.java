@@ -65,6 +65,7 @@ public class UserDTO implements Serializable {
     @ApiModelProperty(value = "岗位ID")
     private Long stationId;
 
+
     /**
      * 邮箱
      */

@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import cn.sunjl.admin.base.entity.Entity;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -87,7 +88,10 @@ public class Role extends Entity<Long> {
     @NotNull(message = "数据权限类型不能为空")
     @TableField("ds_type")
     private DataScopeType dsType;*/
-
+    @ApiModelProperty(value = "逻辑删除(1:已删除，0:未删除)")
+    @TableField("is_deleted")
+    @TableLogic
+    private Boolean deleted;
 
     @Builder
     public Role(Long id, Long createUser, LocalDateTime createTime, Long updateUser, LocalDateTime updateTime,

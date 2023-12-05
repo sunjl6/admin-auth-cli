@@ -1,17 +1,22 @@
 package cn.sunjl.admin.zuul.filter;
 
 import cn.hutool.core.util.StrUtil;
+import cn.sunjl.admin.authority.entity.auth.User;
 import cn.sunjl.admin.base.R;
 import cn.sunjl.admin.common.adapter.IgnoreTokenConfig;
+import cn.sunjl.admin.zuul.api.UserApi;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 public  abstract class BaseFilter extends ZuulFilter {
+
     @Value("${server.servlet.context-path}")
     protected String zuulPrefix;
     /**

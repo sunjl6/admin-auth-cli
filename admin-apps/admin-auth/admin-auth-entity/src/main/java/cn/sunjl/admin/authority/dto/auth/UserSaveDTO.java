@@ -2,8 +2,10 @@ package cn.sunjl.admin.authority.dto.auth;
 
 import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import cn.sunjl.admin.authority.enumeration.auth.Sex;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+
+import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 
 /**
  * <p>
@@ -54,6 +58,10 @@ public class UserSaveDTO implements Serializable {
      * 组织ID
      * #admin_core_org
      */
+    @ApiModelProperty(value = "员工工号")
+    @NotEmpty(message = "员工工号不能为空")
+    @Length(max = 8, message = "账号长度不能超过8")
+    private String employeeId;
     @ApiModelProperty(value = "组织ID")
     private Long orgId;
     /**
@@ -79,7 +87,7 @@ public class UserSaveDTO implements Serializable {
      * #Sex{W:女;M:男;N:未知}
      */
     @ApiModelProperty(value = "性别")
-    private Sex sex;
+    private String sex;
     /**
      * 启用状态 1启用 0禁用
      */

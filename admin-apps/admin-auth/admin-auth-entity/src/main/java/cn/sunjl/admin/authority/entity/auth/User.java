@@ -7,6 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import cn.sunjl.admin.authority.enumeration.auth.Sex;
 import cn.sunjl.admin.base.entity.Entity;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -49,6 +50,11 @@ public class User extends Entity<Long> {
     @TableField(value = "account", condition = LIKE)
     private String account;
 
+    @ApiModelProperty(value = "员工工号")
+    @NotEmpty(message = "员工工号不能为空")
+    @Length(max = 8, message = "账号长度不能超过30")
+    @TableField(value = "employee_id", condition = LIKE)
+    private String employeeId;
     /**
      * 姓名
      */
@@ -96,7 +102,7 @@ public class User extends Entity<Long> {
      */
     @ApiModelProperty(value = "性别")
     @TableField("sex")
-    private Sex sex;
+    private String sex;
 
     /**
      * 启用状态 1启用 0禁用
@@ -159,12 +165,15 @@ public class User extends Entity<Long> {
     @TableField("last_login_time")
     private LocalDateTime lastLoginTime;
 
-
+    @ApiModelProperty(value = "逻辑删除(1:已删除，0:未删除)")
+    @TableField("is_deleted")
+    @TableLogic
+    private int deleted;
     @Builder
     public User(Long id, Long createUser, LocalDateTime createTime, Long updateUser, LocalDateTime updateTime,
-                String account, String name, Long orgId, Long stationId, String email,
-                String mobile, Sex sex, Boolean status, String avatar, String workDescribe, LocalDateTime passwordErrorLastTime,
-                Integer passwordErrorNum, LocalDateTime passwordExpireTime, String password, LocalDateTime lastLoginTime) {
+                String account, String name, Long orgId, Long stationId, String email,String employeeId,
+                String mobile, String sex, Boolean status, String avatar, String workDescribe, LocalDateTime passwordErrorLastTime,
+                Integer passwordErrorNum,int deleted, LocalDateTime passwordExpireTime, String password, LocalDateTime lastLoginTime) {
         this.id = id;
         this.createUser = createUser;
         this.createTime = createTime;
@@ -175,6 +184,7 @@ public class User extends Entity<Long> {
         this.orgId = orgId;
         this.stationId = stationId;
         this.email = email;
+        this.employeeId=employeeId;
         this.mobile = mobile;
         this.sex = sex;
         this.status = status;
@@ -185,6 +195,7 @@ public class User extends Entity<Long> {
         this.passwordExpireTime = passwordExpireTime;
         this.password = password;
         this.lastLoginTime = lastLoginTime;
+        this.deleted =deleted;
     }
 
 }

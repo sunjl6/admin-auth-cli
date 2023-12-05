@@ -3,6 +3,7 @@ package cn.sunjl.admin.authority.dto.auth;
 import java.time.LocalDateTime;
 
 import cn.sunjl.admin.authority.enumeration.auth.Sex;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotEmpty;
+
+import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 
 /**
  * 用户分页DTO
@@ -58,12 +64,15 @@ public class UserPageDTO {
      * #Sex{W:女;M:男}
      */
     @ApiModelProperty(value = "性别")
-    private Sex sex;
+    private String sex;
     /**
      * 是否可登陆
      */
     @ApiModelProperty(value = "启用状态 1启用 0禁用")
     private Boolean status;
+
+    @ApiModelProperty(value = "员工工号")
+    private String employeeId;
 
     @ApiModelProperty(value = "是否可登陆")
     private Boolean isCanLogin;

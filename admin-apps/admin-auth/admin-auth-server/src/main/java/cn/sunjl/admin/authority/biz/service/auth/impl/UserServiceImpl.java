@@ -74,7 +74,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User saveUser(User user) {
         // 永不过期
         user.setPasswordExpireTime(null);
-
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         user.setPasswordErrorNum(0);
         super.save(user);
