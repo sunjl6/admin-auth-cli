@@ -13,12 +13,14 @@
         <result column="org_id" jdbcType="BIGINT" property="orgId"/>
         <result column="status" jdbcType="BIT" property="status"/>
         <result column="describe_" jdbcType="VARCHAR" property="describe"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="tree_path" jdbcType="VARCHAR" property="treePath"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, create_time, create_user, update_time, update_user,
-        name, org_id, status, describe_
+        name, org_id, status, describe_,parent_id, tree_path,
     </sql>
 
 </mapper>

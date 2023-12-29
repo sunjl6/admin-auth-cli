@@ -57,6 +57,9 @@ public class StationPageDTO implements Serializable {
     @Length(max = 255, message = "描述长度不能超过255")
     private String describe;
 
+    @ApiModelProperty(value = "父ID")
+    private Long parentId;
+
     @ApiModelProperty(value = "开始创建时间")
     private LocalDateTime startCreateTime;
     @ApiModelProperty(value = "截止创建时间")

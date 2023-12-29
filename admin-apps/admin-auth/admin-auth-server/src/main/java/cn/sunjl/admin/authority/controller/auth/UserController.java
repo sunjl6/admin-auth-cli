@@ -232,6 +232,8 @@ public class UserController extends BaseController {
     @DeleteMapping
     @SysLog("删除用户")
     public R<Boolean> delete(@RequestParam("ids[]") List<Long> ids) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("status",0);
         userService.removeByIds(ids);
         return success(true);
     }

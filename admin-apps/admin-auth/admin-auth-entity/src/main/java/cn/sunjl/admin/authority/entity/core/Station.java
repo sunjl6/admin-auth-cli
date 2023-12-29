@@ -61,6 +61,22 @@ public class Station extends Entity<Long> {
     @TableField("status")
     private Boolean status;
 
+
+    /**
+     * 父ID
+     */
+    @ApiModelProperty(value = "父ID")
+    @TableField("parent_id")
+    private Long parentId;
+
+    /**
+     * 树结构
+     */
+    @ApiModelProperty(value = "树结构")
+    @Length(max = 255, message = "树结构长度不能超过255")
+    @TableField(value = "tree_path", condition = LIKE)
+    private String treePath;
+
     /**
      * 描述
      */
@@ -71,7 +87,7 @@ public class Station extends Entity<Long> {
 
     @Builder
     public Station(Long id, LocalDateTime createTime, Long createUser, LocalDateTime updateTime, Long updateUser,
-                   String name, Long orgId, Boolean status, String describe) {
+                   String name, Long orgId, Boolean status, String describe, Long parentId, String treePath) {
         this.id = id;
         this.createTime = createTime;
         this.createUser = createUser;
@@ -81,5 +97,7 @@ public class Station extends Entity<Long> {
         this.orgId = orgId;
         this.status = status;
         this.describe = describe;
+        this.parentId = parentId;
+        this.treePath = treePath;
     }
 }

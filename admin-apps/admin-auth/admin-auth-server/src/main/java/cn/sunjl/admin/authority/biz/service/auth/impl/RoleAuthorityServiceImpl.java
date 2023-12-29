@@ -93,7 +93,6 @@ public class RoleAuthorityServiceImpl extends ServiceImpl<RoleAuthorityMapper, R
             list.addAll(menuList);
         }
         super.saveBatch(list);
-
         // 清理
         List<Long> userIdList = userRoleService.listObjs(Wraps.<UserRole>lbQ().select(UserRole::getUserId).eq(UserRole::getRoleId, dto.getRoleId()),
                 (userId) -> NumberHelper.longValueOf0(userId));

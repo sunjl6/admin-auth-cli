@@ -2,7 +2,6 @@ package cn.sunjl.admin.authority.biz.service.auth.impl;
 
 import cn.sunjl.admin.authority.biz.service.auth.ResourceService;
 import cn.sunjl.admin.authority.biz.service.auth.UserService;
-import cn.sunjl.admin.authority.biz.service.common.LoginLogService;
 import cn.sunjl.admin.authority.dto.auth.LoginDTO;
 import cn.sunjl.admin.authority.dto.auth.ResourceQueryDTO;
 import cn.sunjl.admin.authority.dto.auth.UserDTO;
@@ -10,6 +9,7 @@ import cn.sunjl.admin.authority.entity.auth.Resource;
 import cn.sunjl.admin.authority.entity.auth.User;
 import cn.sunjl.admin.base.R;
 import cn.sunjl.admin.dozer.DozerUtils;
+import cn.sunjl.admin.exception.BizException;
 import cn.sunjl.admin.exception.code.ExceptionCode;
 import cn.sunjl.admin.jwt.server.utils.JwtTokenServerUtils;
 import cn.sunjl.admin.jwt.utils.JwtUserInfo;
@@ -92,6 +92,9 @@ public class AuthManager {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("account",account);
         User user = this.userService.getOne(wrapper);
+        if (user == null){
+            throw new BizException("账号或者密码错误");
+        }
         return user.getStatus();
     }
     // 登录验证

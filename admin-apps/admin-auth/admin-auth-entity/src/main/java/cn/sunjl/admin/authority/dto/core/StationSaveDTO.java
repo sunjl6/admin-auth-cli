@@ -56,4 +56,7 @@ public class StationSaveDTO implements Serializable {
     @Length(max = 255, message = "描述长度不能超过255")
     private String describe;
 
+    @ApiModelProperty(value = "父ID")
+    private Long parentId;
+
 }

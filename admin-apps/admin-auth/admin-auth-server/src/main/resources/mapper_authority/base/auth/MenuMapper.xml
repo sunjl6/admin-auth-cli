@@ -19,11 +19,12 @@
         <result column="icon" jdbcType="VARCHAR" property="icon"/>
         <result column="group_" jdbcType="VARCHAR" property="group"/>
         <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="is_hidden" jdbcType="BIT" property="hidden"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_user, create_time, update_user, update_time, 
+        id, create_user, create_time, update_user, update_time,is_hidden,
         name, describe_, is_public, path, component, is_enable, sort_value, icon, group_, parent_id
     </sql>
 

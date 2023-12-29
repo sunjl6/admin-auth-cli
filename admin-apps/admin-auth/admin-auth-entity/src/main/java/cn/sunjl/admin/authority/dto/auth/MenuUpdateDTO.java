@@ -76,6 +76,12 @@ public class MenuUpdateDTO implements Serializable {
      */
     @ApiModelProperty(value = "是否启用")
     private Boolean isEnable;
+
+    /**
+     * 是否隐藏
+     */
+    @ApiModelProperty(value = "是否隐藏")
+    private Boolean hidden;
     /**
      * 排序
      */

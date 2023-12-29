@@ -17,6 +17,7 @@
         <module>admin-auth</module>
         <module>admin-gateway</module>
         <module>admin-test</module>
+        <module>admin-activiti</module>
     </modules>
 
 </project>

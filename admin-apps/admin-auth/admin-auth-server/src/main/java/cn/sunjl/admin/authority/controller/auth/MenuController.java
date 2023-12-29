@@ -180,6 +180,7 @@ public class MenuController extends BaseController {
             userId = userInfo.getUserId();
         }
         List<Menu> list = menuService.findVisibleMenu(group, userId);
+        System.out.println(list);
         List<VueRouter> treeList = dozer.mapList(list, VueRouter.class);
         return success(TreeUtil.build(treeList));
     }

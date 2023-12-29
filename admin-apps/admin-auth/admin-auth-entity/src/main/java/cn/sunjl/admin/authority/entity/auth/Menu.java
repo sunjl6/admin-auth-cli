@@ -87,6 +87,11 @@ public class Menu extends Entity<Long> {
     @TableField("is_enable")
     private Boolean isEnable;
 
+    @ApiModelProperty(value = "是否隐藏")
+    @TableField("is_hidden")
+    private Boolean hidden;
+
+
     /**
      * 排序
      */
@@ -118,9 +123,10 @@ public class Menu extends Entity<Long> {
     private Long parentId;
 
 
+
     @Builder
     public Menu(Long id, Long createUser, LocalDateTime createTime, Long updateUser, LocalDateTime updateTime,
-                String name, String describe, Boolean isPublic, String path, String component,
+                String name, String describe, Boolean isPublic, String path, String component,Boolean hidden,
                 Boolean isEnable, Integer sortValue, String icon, String group, Long parentId) {
         this.id = id;
         this.createUser = createUser;
@@ -133,6 +139,7 @@ public class Menu extends Entity<Long> {
         this.path = path;
         this.component = component;
         this.isEnable = isEnable;
+        this.hidden = hidden;
         this.sortValue = sortValue;
         this.icon = icon;
         this.group = group;

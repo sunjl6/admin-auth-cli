@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.oschina.j2cache.CacheChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,9 @@ public class ResourceController extends BaseController {
     private ResourceService resourceService;
     @Autowired
     private DozerUtils dozer;
+
+    @Autowired
+    private CacheChannel cacheChannel;
     /**
      * 分页查询资源
      */

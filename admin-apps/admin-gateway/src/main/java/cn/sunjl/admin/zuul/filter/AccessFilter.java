@@ -88,6 +88,8 @@ public class AccessFilter extends BaseFilter{
             }).count();
             if (count == 0){
                 errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(), ExceptionCode.UNAUTHORIZED.getCode(), 200);
+                cacheChannel.clear(CacheKey.RESOURCE);
+                cacheChannel.clear(CacheKey.RESOURCE_NEED_TO_CHECK);
                 return null;
             }
         }
@@ -118,7 +120,6 @@ public class AccessFilter extends BaseFilter{
 //                cacheChannel.set(CacheKey.USER_RESOURCE,userId,resourceList);
 //            }
         }
-
         Long count2 = 0L;
         //  第6步：如果用户拥有的权限包含当前请求的权限标识符则说明当前用户拥有权限，直接放行
         count2 =  userPermmsionsList.stream().filter((resource)->{

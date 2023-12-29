@@ -2,10 +2,7 @@ package cn.sunjl.admin.authority.controller.core;
 import java.util.List;
 
 import cn.sunjl.admin.authority.biz.service.core.StationService;
-import cn.sunjl.admin.authority.dto.core.StationPageDTO;
-import cn.sunjl.admin.authority.dto.core.StationSaveDTO;
-import cn.sunjl.admin.authority.dto.core.StationUpdateDTO;
-import cn.sunjl.admin.authority.entity.core.Org;
+import cn.sunjl.admin.authority.dto.core.*;
 import cn.sunjl.admin.authority.entity.core.Station;
 import cn.sunjl.admin.base.BaseController;
 import cn.sunjl.admin.base.R;
@@ -14,6 +11,7 @@ import cn.sunjl.admin.database.mybatis.conditions.Wraps;
 import cn.sunjl.admin.database.mybatis.conditions.query.LbqWrapper;
 import cn.sunjl.admin.dozer.DozerUtils;
 import cn.sunjl.admin.log.annotation.SysLog;
+import cn.sunjl.admin.utils.TreeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -123,4 +121,20 @@ public class StationController extends BaseController {
         stationService.removeByIds(ids);
         return success();
     }
+    // 查询岗位树
+    @ApiOperation(value = "查询系统所有的岗位树", notes = "查询系统所有的岗位树")
+    @GetMapping("/tree")
+    @SysLog("查询系统所有的岗位树")
+    public R<List<StationTreeDTO>> tree(@RequestParam(value = "name", required = false) String name,
+                                    @RequestParam(value = "status", required = false) Boolean status) {
+
+        QueryWrapper<Station> wrapper = new QueryWrapper<>();
+//        wrapper.like("name",name).eq("status",true);
+//        List<Station> list = stationService.list(wrapper);
+        List<Station> list = this.stationService.list(Wraps.<Station>lbQ().like(Station::getName, name)
+                .eq(Station::getStatus, status));
+        List<StationTreeDTO> treeList = this.dozer.mapList(list, StationTreeDTO.class);
+        return this.success(TreeUtil.build(treeList));
+    }
+
 }
