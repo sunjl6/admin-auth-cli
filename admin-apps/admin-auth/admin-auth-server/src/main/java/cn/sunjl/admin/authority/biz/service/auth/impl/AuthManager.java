@@ -60,7 +60,6 @@ public class AuthManager {
                 findVisibleResource(ResourceQueryDTO.builder().
                         userId(user.getId()).build());
         List<String> permissionsList = null;
-        System.out.println(resourceList);
         if(resourceList != null && resourceList.size() > 0){
             permissionsList = resourceList.stream().
                     map(Resource::getCode).

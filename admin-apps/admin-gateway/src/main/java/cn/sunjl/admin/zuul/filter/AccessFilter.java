@@ -69,6 +69,16 @@ public class AccessFilter extends BaseFilter{
 //        切割后的Url++++/authority/user/profile
 //        再次切割后的Url++++/user/profile
 
+
+        // 如果发送的请求包含下面路径说明用户在做修改权限的操作，这时候为了能立刻生效，必须清理下用户缓存
+        if (permission.contains("POST/role/authority")){
+            cacheChannel.clear(CacheKey.USER_RESOURCE);
+            String userId = RequestContext.getCurrentContext().getZuulRequestHeaders().get(BaseContextConstants.JWT_KEY_USER_ID);
+            ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
+            resourceQueryDTO.setUserId(new Long(userId));
+            List<Resource> data = resourceApi.visible(resourceQueryDTO).getData();
+        }
+
      //  第3步：从缓存中获取所有需要进行鉴权的资源(同样是由资源表的method字段值+url字段值拼接成)，如果没有获取到则通过Feign调用权限服务获取并放入缓存中
         CacheObject cacheObject = cacheChannel.get(CacheKey.RESOURCE, CacheKey.RESOURCE_NEED_TO_CHECK);
         List<String> list = (List<String>) cacheObject.getValue();
@@ -82,7 +92,6 @@ public class AccessFilter extends BaseFilter{
 
         //  第4步：判断这些资源是否包含当前请求的权限标识符，如果不包含当前请求的权限标识符，则返回未经授权错误提示
         if(list != null){
-
             long count = list.stream().filter((r) -> {
                 return permission.startsWith(r);
             }).count();
@@ -97,18 +106,16 @@ public class AccessFilter extends BaseFilter{
         //  第5步：如果包含当前的权限标识符，则从zuul header中取出用户id，根据用户id取出缓存中的用户拥有的权限，如果没有取到则通过Feign调用权限服务获取并放入缓存，判断用户拥有的权限是否包含当前请求的权限标识符
         String userId = RequestContext.getCurrentContext().getZuulRequestHeaders().get(BaseContextConstants.JWT_KEY_USER_ID);
 
-//        if (userId == null){
-//            return  R.fail("空token");
-//        }
-
         List<String> userPermmsionsList = new ArrayList<String>();
         CacheObject userPermissionObject = cacheChannel.get(CacheKey.USER_RESOURCE, userId);
          userPermmsionsList  = (List<String>) userPermissionObject.getValue();
         if (userPermmsionsList == null){
+            // 如果每页权限 那么就再次获取用户权限 获取用户权限 的service 里包含吧用户权限写入缓存的操作
             ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
-
             resourceQueryDTO.setUserId(new Long(userId));
             List<Resource> data = resourceApi.visible(resourceQueryDTO).getData();
+            userPermissionObject = cacheChannel.get(CacheKey.USER_RESOURCE, userId);
+            userPermmsionsList  = (List<String>) userPermissionObject.getValue();
             //            List<String> resourceList = list.stream().map((Resource r) -> {
 //                return r.getMethod() + r.getUrl();
 //            }).collect(Collectors.toList());
@@ -120,14 +127,14 @@ public class AccessFilter extends BaseFilter{
 //                cacheChannel.set(CacheKey.USER_RESOURCE,userId,resourceList);
 //            }
         }
-        Long count2 = 0L;
+
         //  第6步：如果用户拥有的权限包含当前请求的权限标识符则说明当前用户拥有权限，直接放行
-        count2 =  userPermmsionsList.stream().filter((resource)->{
-            return permission.contains(resource);
-        }).count();
-//        System.out.println("拥有的权限列表"+userPermissionObject);
-//        System.out.println("访问的权限"+permission);
-//        System.out.println("拥有权限的数量"+count2);
+        Long count2 ;
+        System.out.println("userPermissionList ==="+userPermmsionsList);
+            count2 =  userPermmsionsList.stream().filter((resource)->{
+                return permission.contains(resource);
+            }).count();
+
       //  第7步：如果用户拥有的权限不包含当前请求的权限标识符则说明当前用户没有权限，返回未经授权错误提示
         if (count2>0){
             return null;

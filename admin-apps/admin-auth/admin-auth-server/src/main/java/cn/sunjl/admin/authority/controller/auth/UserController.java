@@ -29,10 +29,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.sun.org.apache.bcel.internal.generic.ACONST_NULL;
 import com.sun.org.apache.bcel.internal.generic.DCONST;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -244,6 +241,7 @@ public class UserController extends BaseController {
      */
     @ApiOperation(value = "查询用户详细", notes = "查询用户详细")
     @PostMapping(value = "/anno/id/{id}")
+    @SysLog("查询用户详细")
     public R<SysUser> getById(@PathVariable Long id, @RequestBody UserQuery query) {
         User user = userService.getById(id);
         if (user == null) {
@@ -268,6 +266,7 @@ public class UserController extends BaseController {
     //从token 获取id 查询
     @ApiOperation(value = "通过token查询用户详细", notes = "通过token查询用户详细")
     @GetMapping(value = "/profile")
+    @SysLog("通过token查询用户详细")
     public R<SysUser> getUserInfoByToken() {
         UserQuery query = new UserQuery();
         query.setFull(true);
@@ -304,9 +303,21 @@ public class UserController extends BaseController {
      */
     @ApiOperation(value = "查询角色的已关联用户", notes = "查询角色的已关联用户")
     @GetMapping(value = "/role/{roleId}")
+    @SysLog("查询角色的已关联用户")
     public R<UserRoleDTO> findUserByRoleId(@PathVariable("roleId") Long roleId, @RequestParam(value = "keyword", required = false) String keyword) {
         List<User> list = userService.findUserByRoleId(roleId, keyword);
         List<Long> idList = list.stream().mapToLong(User::getId).boxed().collect(Collectors.toList());
         return success(UserRoleDTO.builder().idList(idList).userList(list).build());
     }
+
+    // 开启和禁用账号
+    @ApiOperation(value = "开启和禁用账号", notes = "开启和禁用账号")
+    @PutMapping(value = "/switchAccountStatus")
+    @SysLog("开启和禁用账号")
+    public R<User> switchAccountStatus(@RequestBody @Validated(SuperEntity.Update.class) UserUpdateDTO data) {
+        User user = dozer.map(data, User.class);
+        userService.updateUser(user);
+        return success(user);
+    }
+
 }
