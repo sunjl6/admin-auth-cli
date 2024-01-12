@@ -85,8 +85,12 @@ public class Station extends Entity<Long> {
     @TableField(value = "describe_", condition = LIKE)
     private String describe;
 
+    // level 职位类型，1 普通员工 2，主管 3 经理 依次往上
+    @ApiModelProperty(value = "职位等级(1:普通员工，2：主管，3：经理)")
+    @TableField(value = "level", condition = LIKE)
+    private String level;
     @Builder
-    public Station(Long id, LocalDateTime createTime, Long createUser, LocalDateTime updateTime, Long updateUser,
+    public Station(Long id,String level, LocalDateTime createTime, Long createUser, LocalDateTime updateTime, Long updateUser,
                    String name, Long orgId, Boolean status, String describe, Long parentId, String treePath) {
         this.id = id;
         this.createTime = createTime;
@@ -99,5 +103,6 @@ public class Station extends Entity<Long> {
         this.describe = describe;
         this.parentId = parentId;
         this.treePath = treePath;
+        this.level = level;
     }
 }

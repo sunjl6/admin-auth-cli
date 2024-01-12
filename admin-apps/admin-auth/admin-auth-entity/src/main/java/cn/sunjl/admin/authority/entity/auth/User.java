@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotEmpty;
 
-import cn.sunjl.admin.authority.enumeration.auth.Sex;
 import cn.sunjl.admin.base.entity.Entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 
@@ -133,6 +134,7 @@ public class User extends Entity<Long> {
      */
     @ApiModelProperty(value = "最后一次输错密码时间")
     @TableField("password_error_last_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime passwordErrorLastTime;
 
     /**
@@ -147,6 +149,7 @@ public class User extends Entity<Long> {
      */
     @ApiModelProperty(value = "密码过期时间")
     @TableField("password_expire_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime passwordExpireTime;
 
     /**
@@ -163,6 +166,7 @@ public class User extends Entity<Long> {
      */
     @ApiModelProperty(value = "最后登录时间")
     @TableField("last_login_time")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime lastLoginTime;
 
     @ApiModelProperty(value = "逻辑删除(1:已删除，0:未删除)")

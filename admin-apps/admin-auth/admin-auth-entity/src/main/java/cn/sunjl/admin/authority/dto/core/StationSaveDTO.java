@@ -2,6 +2,7 @@ package cn.sunjl.admin.authority.dto.core;
 
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+
+import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 
 /**
  * <p>
@@ -58,5 +61,7 @@ public class StationSaveDTO implements Serializable {
 
     @ApiModelProperty(value = "父ID")
     private Long parentId;
+    @ApiModelProperty(value = "职位等级(1:普通员工，2：主管，3：经理)")
+    private String level;
 
 }

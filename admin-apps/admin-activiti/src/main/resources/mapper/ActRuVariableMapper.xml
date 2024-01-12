@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.sunjl.admin.activiti.dao.ActRuVariableMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.sunjl.admin.activiti.pojo.ActRuVariable">
+        <result column="ID_" jdbcType="VARCHAR" property="id"/>
+        <result column="REV_" jdbcType="INTEGER" property="rev"/>
+        <result column="TYPE_" jdbcType="VARCHAR" property="type"/>
+        <result column="NAME_" jdbcType="VARCHAR" property="name"/>
+        <result column="EXECUTION_ID_" jdbcType="VARCHAR" property="executionId"/>
+        <result column="PROC_INST_ID_" jdbcType="VARCHAR" property="procInstId"/>
+        <result column="TASK_ID_" jdbcType="VARCHAR" property="taskId"/>
+        <result column="BYTEARRAY_ID_" jdbcType="VARCHAR" property="byteArrayId"/>
+        <result column="DOUBLE_" jdbcType="DOUBLE" property="double_"/>
+        <result column="LONG_" jdbcType="BIGINT" property="long_"/>
+        <result column="TEXT_" jdbcType="VARCHAR" property="text"/>
+        <result column="TEXT2_" jdbcType="VARCHAR" property="text2"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID_, REV_, NAME_,TYPE_,EXECUTION_ID_, PROC_INST_ID_,TASK_ID_,BYTEARRAY_ID_,DOUBLE_,LONG_,TEXT_,TEXT2_
+    </sql>
+
+</mapper>

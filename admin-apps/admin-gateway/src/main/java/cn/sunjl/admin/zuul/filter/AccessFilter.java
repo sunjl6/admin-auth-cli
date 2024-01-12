@@ -71,13 +71,17 @@ public class AccessFilter extends BaseFilter{
 
 
         // 如果发送的请求包含下面路径说明用户在做修改权限的操作，这时候为了能立刻生效，必须清理下用户缓存
-        if (permission.contains("POST/role/authority")){
+        if (permission.contains("POST/role/authority") || permission.contains("POST/resource")){
+            System.out.println("新增权限了 需要清空下缓存");
+            cacheChannel.clear(CacheKey.RESOURCE);
+            cacheChannel.clear(CacheKey.RESOURCE_NEED_TO_CHECK);
             cacheChannel.clear(CacheKey.USER_RESOURCE);
             String userId = RequestContext.getCurrentContext().getZuulRequestHeaders().get(BaseContextConstants.JWT_KEY_USER_ID);
             ResourceQueryDTO resourceQueryDTO = new ResourceQueryDTO();
             resourceQueryDTO.setUserId(new Long(userId));
             List<Resource> data = resourceApi.visible(resourceQueryDTO).getData();
         }
+        // 如歌亲求的路径包含
 
      //  第3步：从缓存中获取所有需要进行鉴权的资源(同样是由资源表的method字段值+url字段值拼接成)，如果没有获取到则通过Feign调用权限服务获取并放入缓存中
         CacheObject cacheObject = cacheChannel.get(CacheKey.RESOURCE, CacheKey.RESOURCE_NEED_TO_CHECK);
@@ -96,9 +100,11 @@ public class AccessFilter extends BaseFilter{
                 return permission.startsWith(r);
             }).count();
             if (count == 0){
+                System.out.println("报错1");
                 errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(), ExceptionCode.UNAUTHORIZED.getCode(), 200);
                 cacheChannel.clear(CacheKey.RESOURCE);
                 cacheChannel.clear(CacheKey.RESOURCE_NEED_TO_CHECK);
+                cacheChannel.clear(CacheKey.USER_RESOURCE);
                 return null;
             }
         }
@@ -139,7 +145,11 @@ public class AccessFilter extends BaseFilter{
         if (count2>0){
             return null;
         }else{
+            System.out.println("报错2");
             errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(), ExceptionCode.UNAUTHORIZED.getCode(), 200);
+            cacheChannel.clear(CacheKey.RESOURCE);
+            cacheChannel.clear(CacheKey.RESOURCE_NEED_TO_CHECK);
+            cacheChannel.clear(CacheKey.USER_RESOURCE);
             return null;
         }
 

@@ -21,9 +21,7 @@ import java.net.InetAddress;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAuthServer
-@EnableFeignClients(value = {
-        "cn.sunjl.admin",
-})
+@EnableFeignClients({"cn.sunjl.admin"})
 @Slf4j
 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
 @EnableLoginArgResolver

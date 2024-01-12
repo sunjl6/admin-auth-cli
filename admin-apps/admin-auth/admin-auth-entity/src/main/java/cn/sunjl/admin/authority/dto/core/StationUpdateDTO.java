@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 
 import cn.sunjl.admin.base.entity.SuperEntity;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
+
+import static com.baomidou.mybatisplus.annotation.SqlCondition.LIKE;
 
 /**
  * <p>
@@ -64,4 +67,7 @@ public class StationUpdateDTO implements Serializable {
 
     @ApiModelProperty(value = "父ID")
     private Long parentId;
+
+    @ApiModelProperty(value = "职位等级(1:普通员工，2：主管，3：经理)")
+    private String level;
 }

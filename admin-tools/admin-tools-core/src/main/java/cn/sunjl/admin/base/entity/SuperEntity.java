@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class SuperEntity<T> implements Serializable, Cloneable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     protected LocalDateTime createTime;
 
     @ApiModelProperty(value = "创建人ID")

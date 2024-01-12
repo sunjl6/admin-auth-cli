@@ -74,6 +74,16 @@ public class UserController extends BaseController {
     @Autowired
     private MinioConfig minioConfig;
 
+
+    // 查询所有用户信息
+    @ApiOperation(value = "查询所有用户2", notes = "查询所有用户2")
+    @GetMapping("/AllUserList")
+    @SysLog("查询所有用户2")
+    public R<List<User>> getAllUser(){
+        List<User> list = userService.list();
+        return R.success(list);
+    }
+
     // 用户修改头像
     @ApiOperation(value = "用户上传头像")
     @PostMapping("/uploadAvatar/{id}")
@@ -133,7 +143,7 @@ public class UserController extends BaseController {
     /**
      * 查询用户
      */
-    @ApiOperation(value = "查询用户", notes = "查询用户")
+    @ApiOperation(value = "ID查询用户", notes = "查询用户")
     @GetMapping("/{id}")
     @SysLog("查询用户")
     public R<UserExt> get(@PathVariable Long id) {
@@ -153,7 +163,27 @@ public class UserController extends BaseController {
         return success(userExt);
     }
 
-// 查询所以用户
+    @ApiOperation(value = "账号查询用户", notes = "账号查询用户")
+    @GetMapping("/getUserByAccount/{account}")
+    @SysLog("账号查询用户")
+    public R<UserExt> getUserByAccount(@PathVariable("account") String account) {
+        User user = userService.getByAccount(account);
+        if (user.getOrgId() == null){
+            return R.fail("获取不到部门信息，请先添加");
+        }
+        if (user.getStationId() == null) {
+            return R.fail("无法获取岗位信息，请先添加");
+        }
+        String orgName = orgService.getById(user.getOrgId()).getName();
+        String stationName = stationService.getById(user.getStationId()).getName();
+        UserExt userExt = dozer.map(user, UserExt.class);
+        userExt.setOrgName(orgName);
+        userExt.setStationName(stationName);
+        return R.success(userExt);
+    }
+
+
+    // 查询所以用户
     @ApiOperation(value = "查询所有用户", notes = "查询所有用户")
     @GetMapping("/find")
     @SysLog("查询所有用户")

@@ -1,4 +1,5 @@
 package cn.sunjl.admin.authority.controller.auth;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +29,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 /**
  * 前端控制器
  * 角色
@@ -58,6 +61,8 @@ public class RoleController extends BaseController {
     private UserRoleService userRoleService;
     @Autowired
     private DozerUtils dozer;
+
+
     /**
      * 分页查询角色
      */
@@ -131,8 +136,14 @@ public class RoleController extends BaseController {
     @ApiOperation(value = "删除角色", notes = "根据id物理删除角色")
     @DeleteMapping
     @SysLog("删除角色")
+    @Transactional
     public R<Boolean> delete(@RequestParam("ids[]") List<Long> ids) {
         roleService.removeById(ids);
+        for (Long id : ids) {
+            QueryWrapper<RoleAuthority> wrapper = new QueryWrapper<>();
+            wrapper.eq("role_id", id);
+            roleAuthorityService.remove(wrapper);
+        }
         return success(true);
     }
 
@@ -207,9 +218,9 @@ public class RoleController extends BaseController {
     @ApiOperation(value = "更新用户角色", notes = "更新用户角色")
     @PutMapping("/assignRoles/{userId}")
     @SysLog("更新用户角色")
-    public R assignRoles(@PathVariable Long userId,@RequestParam("roleIds[]") List<Long> ids) {
+    public R assignRoles(@PathVariable Long userId, @RequestParam("roleIds[]") List<Long> ids) {
         QueryWrapper<UserRole> wrapper = new QueryWrapper();
-        wrapper.eq("user_id",userId);
+        wrapper.eq("user_id", userId);
         List<UserRole> listRole = userRoleService.list(wrapper);
         Long[] rolesIdsInSql = listRole.stream().map(UserRole::getRoleId).toArray(Long[]::new);
 
@@ -222,7 +233,7 @@ public class RoleController extends BaseController {
         // 这个循环是 比较数据库拿出来的爵角色是否包含我这个 如果没用 那么就插入数据
         for (int i = 0; i < a.size(); i++) {
             Boolean isExist = isExist(a.get(i), b);
-            if (isExist==false){
+            if (isExist == false) {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(userId);
                 userRole.setRoleId(a.get(i));
@@ -236,10 +247,10 @@ public class RoleController extends BaseController {
         for (int i = 0; i < b.size(); i++) {
             Boolean isExist = isExist(b.get(i), a);
 //            System.out.println("当前角色id"+b.get(i)+"和传递过来的id比较存在的值是"+isExist);
-            if (isExist==false){
+            if (isExist == false) {
                 // 这里判断没用了 那么就删除这条记录
                 QueryWrapper<UserRole> wrapper1 = new QueryWrapper();
-                wrapper1.eq("user_id",userId).eq("role_id",b.get(i));
+                wrapper1.eq("user_id", userId).eq("role_id", b.get(i));
                 userRoleService.remove(wrapper1);
             }
         }
@@ -248,11 +259,11 @@ public class RoleController extends BaseController {
     }
 
     // 数组判断是否有一样的，元素
-    private Boolean isExist (Long id,List<Long> list){
+    private Boolean isExist(Long id, List<Long> list) {
         boolean b = false;
         for (int i = 0; i < list.size(); i++) {
             Long sqlId = list.get(i);
-            if (id.equals(sqlId)){
+            if (id.equals(sqlId)) {
                 b = true;
                 break;
             }

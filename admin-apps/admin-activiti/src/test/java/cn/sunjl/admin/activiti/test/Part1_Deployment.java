@@ -1,24 +1,92 @@
 package cn.sunjl.admin.activiti.test;
 
+import cn.sunjl.admin.activiti.entity.UserTaskModel;
+import cn.sunjl.admin.activiti.pojo.ActGeByteArrary;
+import cn.sunjl.admin.activiti.service.ActGeByteArraryService;
+import com.alibaba.cloud.commons.lang.StringUtils;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.delegate.event.BaseEntityEventListener;
 import org.activiti.engine.repository.Deployment;
+import org.apache.commons.compress.utils.Lists;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipInputStream;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class Part1_Deployment {
+public class Part1_Deployment  {
     // 这里操作的是 ACT_RE_DEPLOYMENT
     @Autowired
     private RepositoryService repositoryService;
     // 通过bpmn 部署流程
+    @Autowired
+    private ActGeByteArraryService actGeByteArraryService;
+    public byte[] getByteArray(String deploymentId){
+        // 从ACT_GE_BYTEARRAY表中获取流程图的二进制文件
+        // 此操作对象必须是已部署的模型，此时流程定义的二进制文件才是以bpmn20.xml结尾的。
+        QueryWrapper<ActGeByteArrary> wrapper = new QueryWrapper<>();
+        wrapper.eq("DEPLOYMENT_ID_", deploymentId);
+        ActGeByteArrary byId = actGeByteArraryService.getOne(wrapper);
+        byte[] bytes = byId.getBytes();
+        return bytes;
+    }
+    @Test
+    public void test222() throws DocumentException, IOException {
+        String deploymentId = "58b0bea4-a9ef-11ee-bcdd-f426796d2a6d";
+                byte[] byteArray = this.getByteArray(deploymentId);
+
+        SAXReader saxReader = new SAXReader();
+//         获取流程图文件中的userTask节点的所有属性
+        ByteArrayInputStream bis = new ByteArrayInputStream(byteArray);
+        Document document = saxReader.read(bis);
+        Element rootElement = document.getRootElement();
+        Element process = rootElement.element("process");
+        List<Element> userTaskList = process.elements("userTask");
+
+        ArrayList<UserTaskModel> list = Lists.newArrayList();
+
+        // 包装成适合前端展示的集合并返回
+        for (Element element : userTaskList) {
+            UserTaskModel userTaskModel = new UserTaskModel();
+            userTaskModel.setId(element.attributeValue("id"));
+            userTaskModel.setName(element.attributeValue("name"));
+
+            String type = "0";
+            String assignee = element.attributeValue("assignee");
+            String candidateUsers = element.attributeValue("candidateUsers");
+            String candidateGroups = element.attributeValue("candidateGroups");
+            if (StringUtils.isNotEmpty(candidateGroups)) {
+                type = "3";
+                userTaskModel.setCandidateGroups(candidateGroups);
+            }
+            if (StringUtils.isNotEmpty(candidateUsers)) {
+                type = "2";
+//                userTaskModel.setCandidateUsers(candidateUsers);
+            }
+            if (StringUtils.isNotEmpty(assignee)) {
+                type = "1";
+                userTaskModel.setAssignee(assignee);
+            }
+            userTaskModel.setType(type);
+            list.add(userTaskModel);
+        }
+        bis.close();
+        System.out.println(list);
+    }
     @Test
     public void testDeployment(){
         String file = "BPMN/webjs.bpmn";

@@ -65,4 +65,7 @@ public class QueryProcessInstance extends Entity<Long> {
     private String superExecutionId;
     @ApiModelProperty(value = "是否开启")
     private boolean isEnded;
+    @ApiModelProperty(value = "谁开启的流程")
+    private String starInstatncetUser;
+    //谁开启的流程
 }

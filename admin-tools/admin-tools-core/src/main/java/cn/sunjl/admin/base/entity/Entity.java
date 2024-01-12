@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class Entity<T> extends SuperEntity<T> {
 
     @ApiModelProperty(value = "最后修改时间")
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     protected LocalDateTime updateTime;
 
     @ApiModelProperty(value = "最后修改人ID")

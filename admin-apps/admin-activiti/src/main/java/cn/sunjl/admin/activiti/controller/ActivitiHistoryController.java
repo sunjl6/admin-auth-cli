@@ -43,7 +43,7 @@ public class ActivitiHistoryController extends BaseController {
     @ApiOperation(value = "用户历史task", notes = "查询获取用户的历史task")
     public R taskHistoryByAssignee() {
         String account = getAccount();
-        account = "bajie"; //测试用
+//        account = "bajie"; //测试用
         List<HistoricTaskInstance> list = historyService
                 .createHistoricTaskInstanceQuery()
                 .orderByHistoricTaskInstanceEndTime().asc()
@@ -136,7 +136,7 @@ public class ActivitiHistoryController extends BaseController {
 
         // // 当前用户完成的任务高亮
         String account = getAccount();
-        account = "bajie"; // 测试用
+//        account = "bajie"; // 测试用
         List<HistoricTaskInstance> currentUserFinishedTask = historyService.createHistoricTaskInstanceQuery().taskAssignee(account).processInstanceId(processInstanceId).finished().list();
         Set<String> UserFinishedTask = new HashSet<>();
         for (HistoricTaskInstance htk : currentUserFinishedTask){
