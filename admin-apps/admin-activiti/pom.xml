@@ -30,11 +30,11 @@
 <!--            <artifactId>jedis</artifactId>-->
 <!--            <version>3.6.0</version>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-            <version>5.2.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.esotericsoftware</groupId>-->
+<!--            <artifactId>kryo</artifactId>-->
+<!--            <version>5.2.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter</artifactId>
@@ -43,6 +43,10 @@
                 <exclusion><!-- 排除activiti的mybatis，避免和外面的mybatis-plus冲突 -->
                     <artifactId>mybatis</artifactId>
                     <groupId>org.mybatis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>el-api</artifactId>
+                    <groupId>javax.el</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

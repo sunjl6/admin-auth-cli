@@ -1,6 +1,7 @@
 package cn.sunjl.admin.activiti.controller;
 
 import cn.sunjl.admin.activiti.dto.HistoricProcessInstancePageDTO;
+import cn.sunjl.admin.activiti.dto.TimeLineDTO;
 import cn.sunjl.admin.base.BaseController;
 import cn.sunjl.admin.base.R;
 import cn.sunjl.admin.log.annotation.SysLog;
@@ -9,16 +10,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.history.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -40,7 +39,74 @@ public class ActivitiHistoryController extends BaseController {
     @Autowired
     private RepositoryService repositoryService;
 
+    //封装一个ElementUI查看流程进度可用使用的流程查看流程进度图的结果信息
+    @SysLog("ElementUI查看流程进度")
+    @RequestMapping(value = "/progressForElementUI", method = RequestMethod.GET)
+    @ApiOperation(value = "ElementUI查看流程进度", notes = "ElementUI查看流程进度")
+    public R progressForElementUI(@RequestParam @ApiParam(name = "processInstanceId", value = "流程实例id") String processInstanceId) {
+        // 通过流程id 参数 获取 他的历史记录
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        // 通过流程定义的id 获取BPMN
+        if (historicProcessInstance == null) {
+            return R.fail("请确认流程id是否正确");
+        }
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(historicProcessInstance.getProcessDefinitionId());
+        // 通过BPMN Model 获取 process
+        Process process = bpmnModel.getProcesses().get(0);
+        // 获取所有流程元素信息
+        Collection<FlowElement> flowElementsList = process.getFlowElements();
+        // 获取所有审批流的节点信息
+        List actList = new ArrayList();
+        for (FlowElement fle : flowElementsList) {
+            // 获取开始名称
+            if (fle instanceof StartEvent) {
+                StartEvent  start = (StartEvent)fle;
 
+                actList.add( start.getName()==null? "开始":start.getName());
+            }
+
+            // 获取所有节点名称
+            if (fle instanceof Activity) {
+                Activity ac = (Activity) fle;
+                String name = ac.getName();
+                actList.add(name);
+            }
+            // 获取结束流程名称
+            if(fle instanceof EndEvent){
+                EndEvent  End = (EndEvent)fle;
+                actList.add(End.getName()==null? "结束":End.getName());
+            }
+        }
+        // 创建一个返回数据的list集合
+        List<TimeLineDTO> resList = new ArrayList<>();
+
+        // 查询已经完成的节点准备封装信息
+        List<HistoricActivityInstance> finishedActList = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).finished().list();
+
+
+        // 遍历所有节点的信息 构造返回数据
+        for (Object o : actList) {
+            String name = o.toString();
+            List<HistoricActivityInstance> list = finishedActList.stream().filter(his -> name.equals(his.getActivityName())).collect(Collectors.toList());
+            if(list.size()<=0){
+                TimeLineDTO timeLineDTO = new TimeLineDTO();
+                timeLineDTO.setName(name);
+                resList.add(timeLineDTO);
+            }else{
+                TimeLineDTO timeLineDTO = new TimeLineDTO();
+                HistoricActivityInstance historicActivityInstance = list.get(0);
+                timeLineDTO.setName(historicActivityInstance.getActivityName());
+                timeLineDTO.setStartTime(historicActivityInstance.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                timeLineDTO.setEndTime(historicActivityInstance.getEndTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                timeLineDTO.setAssignee(historicActivityInstance.getAssignee());
+                resList.add(timeLineDTO);
+            }
+
+        }
+
+
+        return R.success(resList);
+    }
 
     // 分页查询所有任务流程
     @SysLog("分页查询所有历史任务")
@@ -55,8 +121,11 @@ public class ActivitiHistoryController extends BaseController {
         }
 
         List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().listPage(page, size);
-
-        return R.success(historicTaskInstances);
+        List<HistoricTaskInstance> list1 = historyService.createHistoricTaskInstanceQuery().list();
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("pagelist", historicTaskInstances);
+        resMap.put("total", list1.size());
+        return R.success(resMap);
     }
 
     //
@@ -64,16 +133,22 @@ public class ActivitiHistoryController extends BaseController {
     @RequestMapping(value = "/pageProcessHistory", method = RequestMethod.GET)
     @ApiOperation(value = "分页查询所有历史流程", notes = "分页查询所有历史流程")
     public R pageProcessInstanceHistory(@RequestParam @ApiParam(name = "page", value = "页码") int page,
-                             @RequestParam @ApiParam(name = "size", value = "每页显示数") int size) {
+                                        @RequestParam @ApiParam(name = "size", value = "每页显示数") int size) {
         if (page <= 1) {
             page = 0;
         } else {
             page = (page - 1) * size;
         }
 
-        List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery()
-                .listPage(page,size);
-        return R.success(list);
+        List<HistoricProcessInstance> pagelist = historyService.createHistoricProcessInstanceQuery()
+                .listPage(page, size);
+
+        List<HistoricProcessInstance> list1 = historyService.createHistoricProcessInstanceQuery().list();
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("pagelist", pagelist);
+        resMap.put("total", list1.size());
+        return R.success(resMap);
     }
 
     // 用户历史任务查询
